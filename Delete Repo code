@@ -27,8 +27,8 @@ public class DeleteRepo {
 		
 //		login
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		driver.findElement(By.id("login_field")).sendKeys("subha280497");
-		driver.findElement(By.id("password")).sendKeys("wLMrhyqnC25eP7j");
+		driver.findElement(By.id("login_field")).sendKeys("github-username");
+		driver.findElement(By.id("password")).sendKeys("github-password");
 		driver.findElement(By.name("commit")).click();
 		
 //		all repositories
