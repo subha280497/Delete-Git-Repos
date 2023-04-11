@@ -1,0 +1,73 @@
+
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class DeleteRepo {
+	
+	static {
+		System.setProperty("webdriver.chrome.driver", "./driver/chromedriver.exe");
+	}
+	
+	public static void main(String[] args) throws InterruptedException {
+		
+//		open browser maximized
+		ChromeOptions options=new ChromeOptions();
+		options.addArguments("start-maximized");
+		WebDriver driver=new ChromeDriver(options);
+		
+//		go to github login page
+		driver.get("https://github.com/login");
+		
+//		login
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.findElement(By.id("login_field")).sendKeys("subha280497");
+		driver.findElement(By.id("password")).sendKeys("wLMrhyqnC25eP7j");
+		driver.findElement(By.name("commit")).click();
+		
+//		all repositories
+		driver.findElement(By.xpath("//summary/img[@alt='@subha280497']")).click();
+		driver.findElement(By.linkText("Your repositories")).click();
+		
+//		To delete the first repository, if all are deleted it will close the browser
+		try {
+			deleteFirstRepo(driver);
+		}
+		catch (Exception e) {
+			driver.quit();
+		}
+	}
+	
+	static void deleteFirstRepo(WebDriver driver) {
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.findElement(By.xpath("//a[@itemprop='name codeRepository']")).click();
+		driver.findElement(By.id("settings-tab")).click();
+		driver.findElement(By.id("dialog-show-repo-delete-menu-dialog")).click();
+		
+		String repoName = driver.findElement(By.xpath("(//div[@class='text-center']/p)[2]")).getText();
+		
+//		method to renew the web-element address (avoid StaleElementException)
+		deleteBtn(driver).click();
+		deleteBtn(driver).click();
+		driver.findElement(By.id("verification_field")).sendKeys(repoName);
+		
+		if(deleteBtn(driver).isEnabled()) {
+			deleteBtn(driver).click();
+		}
+		
+//		Re-executes the same code until all repos are deleted after that throws exception
+		WebDriverWait wait=new WebDriverWait(driver, 10);
+		wait.until(ExpectedConditions.titleIs("Your Repositories"));
+		deleteFirstRepo(driver);
+	}
+	
+	static WebElement deleteBtn(WebDriver driver) {
+		return driver.findElement(By.id("repo-delete-proceed-button"));
+	}
+}
